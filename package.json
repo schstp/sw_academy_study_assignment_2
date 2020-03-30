@@ -1,0 +1,34 @@
+{
+  "name": "assignment_2",
+  "version": "1.0.0",
+  "description": "The second study assignment for Smart World Academy front-end devs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schstp/sw_academy_study_assignment_2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/schstp/sw_academy_study_assignment_2/issues"
+  },
+  "homepage": "https://github.com/schstp/sw_academy_study_assignment_2#readme",
+  "devDependencies": {
+    "autoprefixer": "^9.7.5",
+    "browser-sync": "^2.26.7",
+    "cssnano": "^4.1.10",
+    "gulp": "^4.0.2",
+    "gulp-imagemin": "^7.1.0",
+    "gulp-postcss": "^8.0.0",
+    "gulp-rigger": "^0.5.8",
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-uglify": "^3.0.2",
+    "imagemin-pngquant": "^8.0.0",
+    "node-sass": "^4.13.1",
+    "rimraf": "^3.0.2"
+  }
+}
