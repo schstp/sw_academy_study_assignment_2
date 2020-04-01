@@ -50,7 +50,6 @@ var config = {
     },
     host: 'localhost',
     port: 9000,
-    browser: ['google-chrome-stable', 'firefox'],
     logPrefix: 'frontend-gulp'
 };
 

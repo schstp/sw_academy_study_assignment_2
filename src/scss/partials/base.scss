@@ -18,42 +18,120 @@ body {
 }
 
 .form-gen-styles {
-  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 400px;
   margin: 20px auto;
   padding: 20px;
   background-color: #ffff;
   border-radius: 15px;
   box-shadow: 0 0 25px #f0f0f0;
 
-  input {
-    outline: none;
-    font-family: inherit;
-    font-size: inherit;
-    color: inherit;
+  .generic-field-wrapper {
 
-    &.form-block-input {
+  }
+
+  .checkbox-field-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    height: 50px;
+    width: fit-content;
+    padding: 0 10px;
+    background-color: #f0f0f0;
+    border: solid #929292 1px;
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eaeaea;
+    }
+
+    > input[type='checkbox'] {
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+
+      &:checked {
+        ~ label {
+          color: #ffffff;
+        }
+
+        ~ div {
+          background-color: #0f7bff;
+        }
+      }
+
+    }
+
+    > label {
+      font-weight: bold;
+      user-select: none;
+      cursor: pointer;
+    }
+  }
+
+  .checkbox-field-clicked {
+    background-color: #0f7bff;
+    border-color: #0f7bff;
+
+    &:hover {
+      background-color: #0f7bff;
+    }
+  }
+
+  .color-field-wrapper {
+    display: flex;
+    width: 95%;
+    justify-content: space-around;
+    align-items: center;
+
+  }
+
+  input {
+    &.form-generic-input {
+      outline: none;
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+
+    &.form-text-input, &.form-email-input, &.form-password-input {
       display: block;
       height: 50px;
       width: 300px;
-      margin: 20px 5px;
+      margin: 20px auto;
       padding-left: 20px;
       border-radius: 5px;
       border: 1px solid #dcdcdc;
     }
+
+    &.form-color-input {
+      background-color: #ffffff;
+      width: 130px;
+      height: 40px;
+      border: solid #929292 1px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
   }
 
-  p {
+  & .form-ref-container {
     text-align: center;
+    margin: 0;
   }
 
-  a {
+  & .form-ref-gen {
     text-decoration: none;
     color: #0f7bff;
   }
 
-  button {
+  & .form-button {
     display: block;
-    margin: auto;
+    margin: 15px auto;
     width: 165px;
     height: 50px;
     background-color: #0f7bff;
@@ -66,11 +144,22 @@ body {
     outline: none;
     border: none;
   }
+
+  & .form-label {
+
+  }
+}
+
+@media screen and (max-width: 460px) {
+  .form-gen-styles {
+    padding: 20px 5px;
+    width: 95%;
+  }
 }
 
 @media screen and (max-width: 424px) {
-  form input {
-    &[type='text'], &[type='password'], &[type='email'] {
+  .form-gen-styles input {
+    &.form-text-input, &.form-email-input, &.form-password-input {
       width: 230px;
     }
   }

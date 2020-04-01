@@ -1,61 +1,56 @@
 
-const types = {
-    form: 'form',
-    input: 'input',
-    label: 'label',
-    plainText: 'text without ref',
-    datalist: 'datalist',
-};
-
 class Form {
 
-    constructor(JSONschema, classList = {}) {
-        this.name = JSONschema.name;
-        this.classList = classList;
-        this.fields = [];
-        this.refs = [];
-        this.btns = [];
+    static _formElementTypes = {
+        fields: (props) => {return new Field(props)},
+        buttons: (props) => {return new Button(props)},
+        references: (props) => {return new Reference(props)},
+    };
 
-        let fieldsCount = 0;
-        for (let field of JSONschema.fields) {
-            let id = `${this.name}_${types.input}_${fieldsCount++}`;
-            this.fields.push(new Field(field, id));
-        }
+    constructor(props) {
+        this.data = {};
+        this.data.name = props.JSONschema.name;
 
-        if (JSONschema.references) {
-            for (let reference of JSONschema.references) {
-                this.refs.push(new Reference(reference));
-            }
-        }
-
-        if (JSONschema.buttons) {
-            for (let button of JSONschema.buttons) {
-                this.btns.push(new Button(button));
-            }
-        }
-
-        this._buildView();
-    }
-
-    _buildView() {
-        this.view = document.createElement(types.form);
-        this.view.setAttribute('name', this.name);
-        this.view.classList.add(this.classList.formGeneral);
-
-        for (let field of this.fields) {
-            for (let prop in field.elements) {
-                if (field.elements.hasOwnProperty(prop) && field.elements[prop]) {
-                    this.view.appendChild(field.elements[prop]);
+        for (let typeName in props.JSONschema) {
+            if (props.JSONschema.hasOwnProperty(typeName) && typeName !== 'name') {
+                let elementsCount = 0;
+                this.data[typeName] = [];
+                for (let item of props.JSONschema[typeName]) {
+                    this.data[typeName].push(Form._formElementTypes[typeName]({
+                        id: `${props.JSONschema.name}_${typeName}_${elementsCount++}`,
+                        item: item,
+                        stylesClassDict: props.stylesClassDict,
+                    }))
                 }
             }
         }
 
-        for (let reference of this.refs) {
-            this.view.appendChild(reference.refEl);
-        }
+        this._buildView(props.stylesClassDict);
+    }
 
-        for (let button of this.btns) {
-            this.view.appendChild(button.btnEl);
+    _buildView(stylesClassDict) {
+        this.view = document.createElement('form');
+        this.view.setAttribute('name', this.data.name);
+        this.view.classList.add(stylesClassDict.form);
+
+        for (let list in this.data) {
+            if (this.data.hasOwnProperty(list) && this.data[list] instanceof Array) {
+                for (let elem of this.data[list]) this._addElemToView(elem.view);
+            }
+        }
+    }
+
+    _addElemToView (elem) {
+
+        for (let childElemName in elem) {
+            if (elem.hasOwnProperty(childElemName)) {
+                if (elem[childElemName].nodeType) {
+                    this.view.appendChild(elem[childElemName]);
+                }
+                else {
+                    this._addElemToView(elem[childElemName]);
+                }
+            }
         }
     }
 
@@ -64,150 +59,233 @@ class Form {
     }
 }
 
-class Field {
-
-    static extraordinaryTypes = {
-        color: 'color',
-        checkbox: 'checkbox'
-    };
-
-    constructor(field, id) {
-        this.id = id;
-        this.elements = {
-            label: false,
-            input: false,
-            datalist: false,
-        };
-
-        for (let elementType in field) {
-            if (field.hasOwnProperty(elementType)) {
-                this.elements[elementType] = document.createElement(elementType);
-
-                if (elementType === types.label) {
-                    this.elements[elementType].innerText = field[elementType];
-                    this.elements[elementType].setAttribute('for', this.id);
-                }
-                else {
-                    field[elementType].id = this.id;
-                    this._makeFormattedInputEl(field[elementType]);
-                }
-            }
-        }
-    }
-
-    _makeFormattedInputEl(inputItem) {
-        if (inputItem.type in Field.extraordinaryTypes) {
-            if (inputItem.type === Field.extraordinaryTypes.color) {
-                this._makeColorInputEl(inputItem);
-            }
-            else if (inputItem.type === Field.extraordinaryTypes.checkbox) {
-                this._makeCheckboxInputEl(inputItem);
-            }
-        }
-        else this._makeGenericInputEl(inputItem);
-    }
-
-    _makeGenericInputEl(inputItem) {
-        for (let attr in inputItem) {
-            if (inputItem.hasOwnProperty(attr)) {
-                $(this.elements.input).prop(attr, inputItem[attr]);
-                this.elements.input.classList.add(classList.blockInput)
-            }
-        }
-    }
-
-    _makeColorInputEl(inputItem) {
-        $(this.elements.input).prop('type', inputItem.type);
-
-        if (inputItem.hasOwnProperty('colors')) {
-            this.elements.datalist = document.createElement(types.datalist);
-            this.elements.datalist.id = `${this.id}_list`;
-            this.elements.input.setAttribute('list', this.elements.datalist.id);
-
-            for (let i = 0; i < inputItem.colors.length; i++) {
-                let optionEl = document.createElement('option');
-                optionEl.value = inputItem.colors[i];
-                this.elements.datalist.appendChild(optionEl);
-            }
-
-            this.elements.input.value = inputItem.colors[0];
-        }
-    }
-
-    _makeCheckboxInputEl(inputItem) {
-        for (let attr in inputItem) {
-            if (inputItem.hasOwnProperty(attr)) {
-                $(this.elements.input).prop(attr, inputItem[attr]);
-                this.elements.input.classList.add(classList.lineInput)
-            }
-        }
-    }
-
-}
 
 class Input {
 
+    static _standardAttrs = ['id', 'autocomplete', 'autofocus', 'disabled', 'form', 'formnovalidate', 'name',
+        'accept', 'alt', 'checked', 'dirname', 'formaction', 'formenctype', 'formmethod',
+        'formtarget', 'height', 'list', 'max', 'min', 'maxlength', 'multiple', 'pattern',
+        'placeholder', 'readonly', 'required', 'size', 'src', 'step', 'type', 'value', 'width'];
+
     constructor(props) {
-        
+        this.data = {};
+        this.view = {};
+        this.view.input = document.createElement('input');
+        this.view.input.classList.add(props.stylesClassDict.input);
+
+        props.item.id = props.id;
+
+        for (let attr in props.item) {
+            if (props.item.hasOwnProperty(attr) && Input._standardAttrs.includes(attr)) {
+                this.data[attr] = props.item[attr];
+                if (attr === 'list') {
+                    this.view.input.setAttribute(attr, this.data[attr]);
+                }
+                else {
+                    $(this.view.input).prop(attr, this.data[attr]);
+                }
+            }
+        }
     }
 }
 
 class TextInput extends Input {
 
-    constructor() {
-        super();
+    _type = 'text';
+
+    constructor(props) {
+        super(props);
+        this.view.input.classList.add(props.stylesClassDict.textInput);
     }
 }
 
 class EmailInput extends Input {
 
-    constructor() {
-        super();
+    _type = 'email';
+
+    constructor(props) {
+        super(props);
+        this.view.input.classList.add(props.stylesClassDict.emailInput);
     }
 }
 
 class PasswordInput extends Input {
 
-    constructor() {
-        super();
+    _type = 'password';
+
+    constructor(props) {
+        super(props);
+        this.view.input.classList.add(props.stylesClassDict.passwordInput);
     }
 }
 
 class CheckboxInput extends Input {
 
-    constructor() {
-        super();
+    _type = 'checkbox';
+
+    constructor(props) {
+        super(props);
+        this.view.input.classList.add(props.stylesClassDict.checkboxInput);
     }
 }
 
 class ColorInput extends Input {
 
-    constructor() {
-        super();
+    _type = 'color';
+
+    constructor(props) {
+
+        if (props.item.hasOwnProperty('colors')) {
+            props.item.list = `${props.id}_list`;
+            props.item.value = props.item.colors[0];
+            super(props);
+            this.data.datalist = new DataList({values: props.item.colors, id: this.data.list});
+            this.view.datalist = this.data.datalist.view;
+        }
+        else {
+            super(props);
+        }
+
+        this.view.input.classList.add(props.stylesClassDict.colorInput);
     }
 }
 
+class DataList {
+
+    constructor(props) {
+        this.data = props;
+        this.view = {};
+        this.view.datalist = document.createElement('datalist');
+        this.view.datalist.id = this.data.id;
+
+        for (let i = 0; i < this.data.values.length; i++) {
+            let optionEl = document.createElement('option');
+            optionEl.value = this.data.values[i];
+            this.view.datalist.appendChild(optionEl);
+        }
+    }
+
+}
+
+class Label {
+
+    constructor(props) {
+        this.data = {
+            for: props.id,
+            text: props.item,
+        };
+        this.view = {};
+        this.view.label = document.createElement('label');
+        this.view.label.innerText = this.data.text;
+        this.view.label.setAttribute('for', this.data.for);
+        this.view.label.classList.add(props.stylesClassDict.label);
+    }
+}
+
+
+class Field {
+
+    static _types = {
+        label: (props) => { return new Label(props) },
+        input: (props) => { return new Field._inputTypes[props.item.type](props) },
+    };
+
+    static _inputTypes = {
+        text: TextInput,
+        email: EmailInput,
+        password: PasswordInput,
+        checkbox: CheckboxInput,
+        color: ColorInput,
+    };
+
+    constructor(props) {
+        this.id = props.id;
+        this.data = {};
+        this.view = {};
+        this.view.container = document.createElement('div');
+
+        for (let elementType in props.item) {
+            if (props.item.hasOwnProperty(elementType)) {
+                this.data[elementType] = Field._types[elementType]({
+                    id: this.id,
+                    item: props.item[elementType],
+                    stylesClassDict: props.stylesClassDict,
+                });
+                this._addElemToView(this.data[elementType].view, props.stylesClassDict);
+            }
+        }
+    }
+
+    _addElemToView (elem, stylesClassDict) {
+        for (let childElemName in elem) {
+            if (elem.hasOwnProperty(childElemName)) {
+                if (elem[childElemName].nodeType) {
+                    this.view.container.appendChild(elem[childElemName]);
+                    this._addFieldWrapper(elem[childElemName], stylesClassDict);
+                }
+                else {
+                    this._addElemToView(elem[childElemName]);
+                }
+            }
+        }
+    }
+
+    _addFieldWrapper (elem, stylesClassDict) {
+        if (elem.tagName === 'INPUT') {
+
+            if (elem.type === 'checkbox') {
+                this.view.container.classList.add(stylesClassDict.wrappers.checkbox);
+                $(this.view.container).on('click', function (e) {
+                    e.preventDefault();
+                    $(elem).prop('checked', !elem.checked);
+                    $(this).toggleClass(stylesClassDict.wrappers.checkboxClicked);
+                })
+            }
+            else if (elem.type === 'color') {
+                this.view.container.classList.add(stylesClassDict.wrappers.color);
+            }
+            else {
+                this.view.container.classList.add(stylesClassDict.wrappers.generic);
+            }
+        }
+    }
+}
+
+
 class Reference {
 
-    constructor(reference) {
-        this.refEl = document.createElement('p');
+    static _plaintText = 'text without ref';
+
+    constructor(props) {
+        this.data = {
+            href: `${props.item.ref}.html`,
+            text: props.item.text,
+            description: props.item.hasOwnProperty(Reference._plaintText) ? props.item[Reference._plaintText] + ' ' : ''
+        };
+
+        this.view = {};
+        this.view.p = document.createElement('p');
         let aEl = document.createElement('a');
-        aEl.setAttribute('href', `${reference.ref}.html`);
-        aEl.innerText = reference['text'];
+        aEl.setAttribute('href', this.data.href);
+        aEl.innerText = this.data.text;
+        aEl.classList.add(props.stylesClassDict.ref);
         aEl.onclick = () => {return false;};
-
-        if (reference.hasOwnProperty(types.plainText)) {
-            this.refEl.innerText = reference[types.plainText] + ' ';
-        }
-
-        this.refEl.appendChild(aEl);
+        this.view.p.appendChild(document.createTextNode(this.data.description));
+        this.view.p.appendChild(aEl);
+        this.view.p.classList.add(props.stylesClassDict.refContainer);
     }
 }
 
 class Button {
 
-    constructor(button) {
-        this.btnEl = document.createElement('button');
-        this.btnEl.innerText = button['text'];
+    constructor(props) {
+        this.data = {
+            text: props.item.text,
+        };
+
+        this.view = {};
+        this.view.button = document.createElement('button');
+        this.view.button.innerText = this.data.text;
+        this.view.button.classList.add(props.stylesClassDict.btn);
     }
 }
