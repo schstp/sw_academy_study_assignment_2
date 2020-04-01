@@ -22,6 +22,7 @@ var paths = {
         scss: 'src/scss/main.scss',
         js: 'src/js/main.js',
         img: 'src/img/**/*.*',
+        forms: 'src/forms/*.json',
     },
 
     build: {
@@ -29,6 +30,7 @@ var paths = {
         css: 'build/css/',
         js: 'build/js/',
         img: 'build/img/',
+        forms: 'build/forms/'
     },
 
     watch: {
@@ -36,6 +38,7 @@ var paths = {
         scss: 'src/scss/**/*.scss',
         js: 'src/js/**/*.js',
         img: 'src/img/**/*.*',
+        forms: 'src/forms/*.json'
     },
 
     clean: './build',
@@ -79,7 +82,6 @@ function js(cb) {
     gulp.src(paths.src.js)
         .pipe(sourcemaps.init())
         .pipe(rigger())
-        .pipe(uglify())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(paths.build.js))
         .pipe(reload({stream: true}));
@@ -103,11 +105,21 @@ function img(cb) {
 }
 
 
+function forms(cb) {
+    gulp.src(paths.src.forms)
+        .pipe(gulp.dest(paths.build.forms))
+        .pipe(reload({stream: true}));
+
+    cb();
+}
+
+
 function watch(cb) {
     gulp.watch(paths.watch.html, html);
     gulp.watch(paths.watch.scss, css);
     gulp.watch(paths.watch.js, js);
     gulp.watch(paths.watch.img, img);
+    gulp.watch(paths.watch.forms, forms);
 
     cb();
 }
@@ -125,7 +137,7 @@ function webserver(cb) {
 }
 
 
-const build = gulp.parallel(html, css, js, img);
+const build = gulp.parallel(html, css, js, img, forms);
 
 exports.html = html;
 exports.css = css;
