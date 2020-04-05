@@ -12,7 +12,7 @@ body {
   color: #929292;
 
   #content {
-    width: 95%;
+    width: 98%;
     margin: auto;
   }
 }
@@ -21,15 +21,21 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 400px;
+  width: 450px;
   margin: 20px auto;
   padding: 20px;
   background-color: #ffff;
   border-radius: 15px;
   box-shadow: 0 0 25px #f0f0f0;
 
-  .generic-field-wrapper {
+  .form-buttons-section {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+  }
 
+  .generic-field-wrapper {
+    width: 400px;
   }
 
   .checkbox-field-wrapper {
@@ -42,7 +48,7 @@ body {
     padding: 0 10px;
     background-color: #f0f0f0;
     border: solid #929292 1px;
-    border-radius: 10px;
+    border-radius: 5px;
 
     cursor: pointer;
 
@@ -58,10 +64,6 @@ body {
       &:checked {
         ~ label {
           color: #ffffff;
-        }
-
-        ~ div {
-          background-color: #0f7bff;
         }
       }
 
@@ -85,8 +87,8 @@ body {
 
   .color-field-wrapper {
     display: flex;
-    width: 95%;
-    justify-content: space-around;
+    width: 400px;
+    justify-content: space-between;
     align-items: center;
 
   }
@@ -99,12 +101,12 @@ body {
       color: inherit;
     }
 
-    &.form-text-input, &.form-email-input, &.form-password-input {
+    &.form-text-input, &.form-email-input, &.form-password-input, &.form-date-input, &.form-number-input {
       display: block;
       height: 50px;
-      width: 300px;
+      width: 88%;
       margin: 20px auto;
-      padding-left: 20px;
+      padding: 0 20px;
       border-radius: 5px;
       border: 1px solid #dcdcdc;
     }
@@ -117,16 +119,94 @@ body {
       border-radius: 5px;
       cursor: pointer;
     }
+
+    &.form-file-input {
+      display: none;
+    }
+
+    &.form-date-input {
+      cursor: pointer;
+    }
+
+    &::-webkit-inner-spin-button, &::-webkit-calendar-picker-indicator {
+      -webkit-appearance: none;
+      display: none;
+    }
+  }
+
+  .form-textarea-input {
+    display: block;
+    resize: none;
+    min-height: 200px;
+    width: 88%;
+    margin: 20px auto;
+    padding: 0 20px;
+    border-radius: 5px;
+    border: 1px solid #dcdcdc;
+
+    outline: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .form-file-input-btn {
+    display: block;
+    margin: 15px 0;
+    width: 165px;
+    line-height: 40px;
+    color: #0f7bff;
+    border: solid #0f7bff 1px;
+    border-radius: 5px;
+    text-align: center;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+
+    &:hover {
+      background-color: #0f7bff;
+      color: #ffffff;
+    }
+  }
+
+  .form-multiple-choice-input {
+    border: none;
+    padding: 0;
+    margin: 20px 0;
+
+    > div {
+      display: inline-flex;
+      height: 40px;
+      margin: 10px 0;
+      margin-right: 10px;
+    }
+  }
+
+  .form-references-section {
+    width: 310px;
+    overflow: hidden;
   }
 
   & .form-ref-container {
-    text-align: center;
     margin: 0;
+    margin-top: 23px;
+    text-align: center;
   }
 
   & .form-ref-gen {
     text-decoration: none;
     color: #0f7bff;
+  }
+
+  .form-ref-checkbox {
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 20px 10px;
+    padding: 0;
+    border-radius: 3px;
   }
 
   & .form-button {
@@ -145,22 +225,62 @@ body {
     border: none;
   }
 
-  & .form-label {
+  & .form-cancel-btn {
+    background-color: #DC3545;
+  }
 
+  & .form-label {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
   }
 }
 
-@media screen and (max-width: 460px) {
+@media screen and (max-width: 500px) {
   .form-gen-styles {
     padding: 20px 5px;
     width: 95%;
   }
 }
 
-@media screen and (max-width: 424px) {
-  .form-gen-styles input {
-    &.form-text-input, &.form-email-input, &.form-password-input {
-      width: 230px;
+@media screen and (max-width: 460px) {
+  .form-gen-styles {
+    .generic-field-wrapper {
+      width: 280px;
+    }
+
+    .color-field-wrapper {
+      width: 280px;
+    }
+
+    .form-buttons-section {
+      width: 280px;
     }
   }
+
+  .form-gen-styles {
+    input {
+      &.form-text-input, &.form-email-input, &.form-password-input, &.form-date-input, &.form-number-input {
+        width: 85%;
+      }
+    }
+
+    .form-textarea-input {
+      width: 86%;
+    }
+
+    .form-file-input {
+      width: 86%;
+    }
+
+    .form-references-section {
+      width: 300px;
+    }
+
+    & .form-ref-container {
+      font-size: 14px;
+    }
+  }
+
+
 }
