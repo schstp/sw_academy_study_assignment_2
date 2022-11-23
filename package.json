@@ -18,7 +18,7 @@
   "homepage": "https://github.com/schstp/sw_academy_study_assignment_2#readme",
   "devDependencies": {
     "autoprefixer": "^9.7.5",
-    "browser-sync": "^2.26.7",
+    "browser-sync": "^2.27.10",
     "cssnano": "^4.1.10",
     "gulp": "^4.0.2",
     "gulp-imagemin": "^7.1.0",
